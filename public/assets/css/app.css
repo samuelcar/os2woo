@@ -1,0 +1,11 @@
+body {
+    padding-top: 80px;
+}
+
+.panel-body p{
+    font-size: xx-large;
+}
+
+.panel-title, .panel-body p, .jumbotron {
+    text-align: center;
+}

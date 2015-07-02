@@ -8,16 +8,8 @@
 
     <!-- Bootstrap core CSS -->
     <link href="https://bootswatch.com/flatly/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/css/app.css"/>
     @yield('header')
-    <style>
-        body {
-            padding-top: 50px;
-        }
-
-        .jumbotron{
-            text-align: center;
-        }
-    </style>
 </head>
 
 <body>
@@ -25,7 +17,8 @@
 <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container">
         <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
                 <span class="sr-only">Toggle navigation</span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
@@ -39,24 +32,26 @@
                 <li @if(Request::is('customers')) class="active" @endif><a href="/customers">Customers</a></li>
                 <li @if(Request::is('orders')) class="active" @endif><a href="/orders">Orders</a></li>
                 <li @if(Request::is('coupons')) class="active" @endif><a href="/coupons">Coupons</a></li>
-                <li @if(Request::is('reports')) class="active" @endif><a href="/reports">Reports</a></li>
+                {{--<li @if(Request::is('reports')) class="active" @endif><a href="/reports">Reports</a></li>--}}
             </ul>
-        </div><!--/.nav-collapse -->
+        </div>
+        <!--/.nav-collapse -->
     </div>
 </nav>
 
 <div class="container">
     @yield('content')
-</div><!-- /.container -->
-
+</div>
+<!-- /.container -->
 
 <!-- Bootstrap core JavaScript
 ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-<script src="../../dist/js/bootstrap.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 <script src="http://cdnjs.cloudflare.com/ajax/libs/vue/0.12.4/vue.min.js"></script>
 @yield('footer')
+<script src="/assets/js/app.js"></script>
 </body>
 </html>
