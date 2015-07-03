@@ -6,6 +6,6 @@ body {
     font-size: xx-large;
 }
 
-.panel-title, .panel-body p, .jumbotron {
+.panel-title, .panel-body p, .jumbotron,.import-controls {
     text-align: center;
 }

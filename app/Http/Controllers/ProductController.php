@@ -2,13 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Importer\Product\ImportedProduct;
+use App\Importer\Product\OsProduct;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use JavaScript;
 
 class ProductController extends Controller
 {
+
     /**
      * Display a listing of the resource.
      *
@@ -16,6 +20,14 @@ class ProductController extends Controller
      */
     public function index()
     {
+
+        JavaScript::put([
+            'os_total' => OsProduct::count(),
+            'imported_total' => ImportedProduct::count(),
+            'products' => array_diff(OsProduct::lists('products_id')->toArray(),
+                ImportedProduct::lists('os_id')->toArray())
+        ]);
+
         return view('importer.products');
     }
 
@@ -26,7 +38,9 @@ class ProductController extends Controller
      */
     public function import()
     {
-        //
+        $product = OsProduct::find(11);
+
+        return $product->transformToWoo();
     }
 
 }

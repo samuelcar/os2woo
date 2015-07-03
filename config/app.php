@@ -147,7 +147,8 @@ return [
         /*
          * External providers
          */
-        Collective\Html\HtmlServiceProvider::class
+        Collective\Html\HtmlServiceProvider::class,
+        Laracasts\Utilities\JavaScript\JavaScriptServiceProvider::class
     ],
 
     /*
@@ -196,7 +197,8 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View'      => Illuminate\Support\Facades\View::class,
         'Html'      => Collective\Html\HtmlFacade::class,
-        'Form'      => Collective\Html\FormFacade::class
+        'Form'      => Collective\Html\FormFacade::class,
+        'JavaScript'=> Laracasts\Utilities\JavaScript\JavaScriptFacade::class
     ],
 
 ];

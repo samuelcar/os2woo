@@ -1,12 +1,13 @@
 <?php
-get('/',function(){
-   return view('home');
+get('/', function () {
+    return view('home');
 });
+post('products', 'ProductController@import');
 
-Route::get('products','ProductController@index');
-Route::get('customers','CustomerController@index');
-Route::get('orders','OrderController@index');
-Route::get('coupons','CouponController@index');
+get('products', 'ProductController@index');
+get('customers', 'CustomerController@index');
+get('orders', 'OrderController@index');
+get('coupons', 'CouponController@index');
 
 Route::controllers([
     'auth' => 'Auth\AuthController',
