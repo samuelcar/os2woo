@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateExportedProductsTable extends Migration
+class CreateImportedProductsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,7 +12,7 @@ class CreateExportedProductsTable extends Migration
      */
     public function up()
     {
-        Schema::create('exported_products', function (Blueprint $table) {
+        Schema::create('imported_products', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('os_id');
             $table->string('name');
