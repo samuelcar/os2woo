@@ -1,7 +1,8 @@
 <?php namespace App\Importer;
 
 use App\Contracts\Store;
-use Mac2000\WooCommerceApiClient\Client;
+use WC_API_Client;
+use WC_API_Client_Products;
 
 class WooCommerceStore implements Store
 {
@@ -16,7 +17,8 @@ class WooCommerceStore implements Store
         $this->url = $url;
         $this->consumer_key = $consumer_key;
         $this->consumer_secret = $consumer_secret;
-        $this->client = new Client($consumer_key, $consumer_secret, $url);
+	    $client = new WC_API_Client( $url, $consumer_key, $consumer_secret );
+	    $this->client = new WC_API_Client_Products( $client );
     }
 
     public function createCoupon(array $coupon)
@@ -25,15 +27,14 @@ class WooCommerceStore implements Store
             'json' => [
                 'coupon' => $coupon
             ]
-        ])->json();
+        ]);
     }
     
     public function createProduct(array $product){
-        return $this->client->post('products', [
-            'json' => [
+        return $this->client->create([
                 'product' => $product
             ]
-        ])->json();
+        );
     }
 
     public function createCustomer(array $customer)

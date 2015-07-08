@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Contracts\Store;
 use App\Importer\Product\ImportedProduct;
 use App\Importer\Product\OsProduct;
-use Illuminate\Http\Request;
+use Exception;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Input;
 use JavaScript;
 
 class ProductController extends Controller
@@ -21,26 +23,45 @@ class ProductController extends Controller
     public function index()
     {
 
-        JavaScript::put([
+	    //ImportedProduct::truncate();
+	    JavaScript::put([
             'os_total' => OsProduct::count(),
             'imported_total' => ImportedProduct::count(),
-            'products' => array_diff(OsProduct::lists('products_id')->toArray(),
-                ImportedProduct::lists('os_id')->toArray())
+            'products' => array_values(array_diff(OsProduct::lists('products_id')->toArray(),
+	            ImportedProduct::lists('os_id')->toArray()))
         ]);
 
         return view('importer.products');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return Response
-     */
-    public function import()
+	/**
+	 * Show the form for creating a new resource.
+	 *
+	 * @param Store $store
+	 *
+	 * @return Response
+	 */
+    public function import(Store $store)
     {
-        $product = OsProduct::find(11);
+	    try {
+	        $product = OsProduct::findOrFail( Input::get( 'product_id' ) );
 
-        return $product->transformToWoo();
+            $result  = $store->createProduct( $product->toWooCommerce() );
+			if(isset($result->product)){
+				$imported = ImportedProduct::create([
+					'os_id' => Input::get( 'product_id' ),
+					'name'  => $result->product->title,
+					'wc_id' => $result->product->id
+				]);
+
+				return ['success' => 1 , 'message' => "Product '{$imported['name']}' imported successfully"];
+			}
+        }catch ( Exception $e){
+			return ['success' => 0,
+					'message' => $e->getMessage()
+			];
+        }
+        return $result;
     }
 
 }

@@ -52,7 +52,9 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 <script src="http://cdnjs.cloudflare.com/ajax/libs/vue/0.12.4/vue.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
 @yield('footer')
+<script src="/assets/js/bootstrap-notify.min.js"></script>
 <script src="/assets/js/app.js"></script>
 </body>
 </html>

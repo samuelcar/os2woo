@@ -23,7 +23,7 @@
             </div>
         </div>
         <div class="col-md-3 col-sm-6">
-            <div class="panel panel-success">
+            <div class="panel panel-info">
                 <div class="panel-heading">
                     <h3 class="panel-title">Percentage Imported</h3>
                 </div>
@@ -33,7 +33,7 @@
             </div>
         </div>
         <div class="col-md-3 col-sm-6">
-            <div class="panel panel-info">
+            <div class="panel panel-success">
                 <div class="panel-heading">
                     <h3 class="panel-title">Enlapsed Time</h3>
                 </div>
