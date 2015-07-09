@@ -2,10 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Contracts\Store;
+use App\Importer\Customer\ErrorCustomer;
+use App\Importer\Customer\ImportedCustomer;
+use App\Importer\Customer\OsCostumer;
+use Exception;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use Faker\Factory;
+use Illuminate\Support\Facades\Input;
+use JavaScript;
 
 class CustomerController extends Controller
 {
@@ -16,16 +23,58 @@ class CustomerController extends Controller
      */
     public function index()
     {
+
+        //ImportedProduct::truncate();
+        JavaScript::put([
+            'url' => '/customers',
+            'os_total' => OsCostumer::count(),
+            'imported_total' => ImportedCustomer::count(),
+            'resource' => array_values(
+                array_diff(OsCostumer::lists('customers_id')->toArray(),
+                    ImportedCustomer::lists('os_id')->toArray(),
+                    ErrorCustomer::lists('os_id')->toArray()
+                )
+            )
+        ]);
+
         return view('importer.customers');
     }
 
     /**
      * Show the form for creating a new resource.
      *
+     * @param Store $store
      * @return Response
      */
-    public function import()
+    public function import(/*Store $store*/)
     {
-        //
+        return ['success' => rand(0,1), 'message' => Factory::create()->text(100)];
+        try {
+            $product = OsCustomer::findOrFail(Input::get('resource_id'));
+
+            $result = $store->createCustomer($product->toWooCommerce());
+            if (isset($result->product)) {
+                $imported = ImportedCustomer::create([
+                    'os_id' => $product->id,
+                    'name' => $result->product->title,
+                    'wc_id' => $result->product->id
+                ]);
+
+                return ['success' => 1, 'message' => "Customer '{$imported['name']}' imported successfully"];
+            }
+        } catch (Exception $e) {
+            ErrorCustomer::create([
+                'os_id' => $product->id,
+                'name' => $product->description->customers_name,
+                'error' => $e->getMessage()
+            ]);
+
+            return [
+                'success' => 0,
+                'message' => $e->getMessage()
+            ];
+        }
+
+        return $result;
     }
 }
