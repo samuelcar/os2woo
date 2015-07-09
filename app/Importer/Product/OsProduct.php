@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property mixed description
  * @property mixed specials
  * @property mixed products_price
+ * @property mixed products_inStock
+ * @property mixed products_image
  */
 class OsProduct extends Model
 {
@@ -17,7 +19,7 @@ class OsProduct extends Model
     protected $connection = 'oscommerce';
     protected $table = 'products';
     protected $primaryKey = 'products_id';
-    protected $image_path = 'https://www.motorsportsuperstore.com.au//catalog/images/';
+    protected $image_path = 'http://www.motorsportsuperstore.com.au//catalog/images/';//'https://threespeedmania.files.wordpress.com/2014/01/kgrhqvomfg44lclpbr1sfermpq60_3.jpg?w=590';
 
     public function specials()
     {
@@ -29,7 +31,7 @@ class OsProduct extends Model
        return $this->hasOne(OsDescription::class, 'products_id', 'products_id');
     }
 
-        public function transformToWoo()
+        public function toWooCommerce()
         {
             return [
                 "title" => $this->description->products_name,
@@ -40,34 +42,35 @@ class OsProduct extends Model
                 "virtual" => false,
                 "sku" => $this->products_model,
                 "regular_price" => $this->products_price,
-                "sale_price" => $this->specials->specials_new_products_price,
-    //            //"sale_price_dates_from" Sets the sale start date. Date in the YYYY-MM-DD format WRITE-ONLY  http://www.terrytsang.com/tutorial/woocommerce/add-sales-end-date-for-woocommerce-product-price/
-    //            //"sale_price_dates_to"	Sets the sale end date. Date in the YYYY-MM-DD format WRITE-ONLY    get_post_meta($post->ID, '_sale_price_dates_to', true);
-    //            "tax_status" => $wc_product->get_tax_status(),
+                "sale_price" => isset($this->specials->specials_new_products_price) ? $this->specials->specials_new_products_price : '',
+                "sale_price_dates_from" => isset($this->specials->start_date) ? $this->specials->start_date : '',
+                "sale_price_dates_to" => isset($this->specials->start_date) ? $this->specials->start_date : '',
+                "tax_status" => 'taxable',
     //            "tax_class" => $wc_product->get_tax_class(),
-    //            //"taxable"	boolean	Show if the product is taxable or not READ-ONLY
-    //            "managing_stock" => $wc_product->managing_stock(),
-    //            //maybe optional
-    //            "stock_quantity" => $wc_product->get_stock_quantity(),
-    //            "in_stock" => $wc_product->is_in_stock(),
+    //            "managing_stock" => $wc_product->managing_stock(), //maybe optional
+                 "stock_quantity" => intval($this->description->products_quantity),
+	             "in_stock" => (bool) $this->products_inStock,
     //            "backorders" => $wc_product->backorders_allowed(),
     //            "sold_individually" => $wc_product->is_sold_individually(),
     //            //"catalog_visibility"    IDK how to get it, but it doesn't seem relevant to our system
     //            "weight" => $wc_product->get_weight(),
     //            "dimensions" => $this->getProductDimensions($wc_product),
     //            "shipping_class" => $wc_product->get_shipping_class(),
-    //            "description" => $post_product->post_content,
-    //            "enable_html_description" => true,
+                  "description" => isset($this->description->products_description) ? $this->description->products_description : '',
+                  "enable_html_description" => true,
     //            "short_description" => $post_product->post_excerpt,
     //            "enable_html_short_description" => true,
-    //            //"reviews_allowed"   boolean	Shows/define if reviews are allowed  optional maybe
+                  "reviews_allowed" => true,
     //            "upsell_ids" => $wc_product->get_upsells(),
     //            //is an array
     //            "cross_sell_ids" => $wc_product->get_cross_sells(),
     //            "parent_id" => $wc_product->get_parent(),
     //            "categories" => $this->getProductCategories($wc_product),
     //            "tags" => $this->getProductTags($wc_product),
-    //            "images" => $images,
+                  'images' => [
+	                ['src' => $this->image_path.$this->products_image, 'position' => 0]
+                  ],
+                  //"images" => [ 'src' => , 'position' => 0 ],
     //            "default_attributes" => $default_attr,
     //            //"downloads" this can be tricky to many variables. can be public?downloads	array	List of downloadable files. See Downloads Properties
     //            //download_limit	integer	Amount of times the product can be downloaded. In write-mode you can sent a blank string for unlimited re-downloads. e.g ''
