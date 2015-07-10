@@ -1,10 +1,10 @@
 <?php
 /**
- * WC API Client Products resource class
+ * WC API Client Orders resource class
  *
  * @since 2.0
  */
-class WC_API_Client_Products extends WC_API_Client_Resource {
+class WC_API_Client_Resource_Orders extends WC_API_Client_Resource {
 
 
 	/**
@@ -15,20 +15,20 @@ class WC_API_Client_Products extends WC_API_Client_Resource {
 	 */
 	public function __construct( $client ) {
 
-		parent::__construct( 'products', $client );
+		parent::__construct( 'orders', 'order', $client );
 	}
 
 
 	/**
-	 * Get products
+	 * Get orders
 	 *
-	 * GET /products
-	 * GET /products/#{id}
+	 * GET /orders
+	 * GET /orders/#{id}
 	 *
 	 * @since 2.0
-	 * @param null|int $id product ID or null to get all products
-	 * @param array $args acceptable product endpoint args, like `status`
-	 * @return array|object products!
+	 * @param null|int $id order ID or null to get all orders
+	 * @param array $args acceptable order endpoint args, like `status`
+	 * @return array|object orders!
 	 */
 	public function get( $id = null, $args = array() ) {
 
@@ -43,13 +43,13 @@ class WC_API_Client_Products extends WC_API_Client_Resource {
 
 
 	/**
-	 * Create a product
+	 * Create an order
 	 *
-	 * POST /products
+	 * POST /orders
 	 *
 	 * @since 2.0
-	 * @param array $data valid product data
-	 * @return array|object your newly-created product
+	 * @param array $data valid order data
+	 * @return array|object your newly-created order
 	 */
 	public function create( $data ) {
 
@@ -111,6 +111,7 @@ class WC_API_Client_Products extends WC_API_Client_Resource {
 	 *
 	 * GET /orders/count
 	 *
+	 * @since 2.0
 	 * @param array $args acceptable order endpoint args, like `status`
 	 * @return array|object the count
 	 */
@@ -120,6 +121,25 @@ class WC_API_Client_Products extends WC_API_Client_Resource {
 			'method' => 'GET',
 			'path'   => 'count',
 			'params' => $args,
+		) );
+
+		return $this->do_request();
+	}
+
+
+	/**
+	 * Get a list of valid order statuses
+	 *
+	 * GET /orders/statuses
+	 *
+	 * @since 2.0
+	 * @return array|object order statuses
+	 */
+	public function get_statuses() {
+
+		$this->set_request_args( array(
+			'method' => 'GET',
+			'path'   => 'statuses',
 		) );
 
 		return $this->do_request();
@@ -143,7 +163,7 @@ class WC_API_Client_Products extends WC_API_Client_Resource {
 		$this->set_request_args( array(
 			'method' => 'PUT',
 			'path'   => $id,
-			'body'   => array( 'order' => array( 'status' => $status ) ),
+			'body'   => array( 'status' => $status ),
 		) );
 
 		return $this->do_request();

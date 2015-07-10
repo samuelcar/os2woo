@@ -7,6 +7,9 @@
 class WC_API_Client {
 
 
+	/** API client version */
+	const VERSION = '2.0.0';
+
 	/** @var string store URL, e.g. http://www.woothemes.com */
 	public $store_url;
 
@@ -19,18 +22,52 @@ class WC_API_Client {
 	/** @var string API URL, e.g. http://www.woothemes.com/wc-api/v2 */
 	public $api_url;
 
-	/** @var bool is verbose mode enabled */
-	public $verbose_mode = false;
+	/** @var bool true if debug is enabled */
+	public $debug = false;
 
 	/** @var bool return the response data as an array, defaults to object */
 	public $return_as_array = false;
 
 	/** @var bool perform validation on the API URL */
-	public $validate_url = true;
+	public $validate_url = false;
 
-	/** API client version */
-	const VERSION = '2.0.0';
+	/** @var int HTTP request timeout */
+	public $timeout = 30;
 
+	/** @var bool true to perform SSL peer verification */
+	public $ssl_verify = true;
+
+	/** Resources */
+
+	/** @var WC_API_Client_Resource_Coupons instance */
+	public $coupons;
+
+	/** @var WC_API_Client_Resource_Custom instance */
+	public $custom;
+
+	/** @var WC_API_Client_Resource_Customers instance */
+	public $customers;
+
+	/** @var WC_API_Client_Resource_Index instance */
+	public $index;
+
+	/** @var WC_API_Client_Resource_Orders instance */
+	public $orders;
+
+	/** @var WC_API_Client_Resource_Order_Notes instance */
+	public $order_notes;
+
+	/** @var WC_API_Client_Resource_Order_Refunds instance */
+	public $order_refunds;
+
+	/** @var WC_API_Client_Resource_Products instance */
+	public $products;
+
+	/** @var WC_API_Client_Resource_Reports instance */
+	public $reports;
+
+	/** @var WC_API_Client_Resource_Webhooks instance */
+	public $webhooks;
 
 	/**
 	 * Setup the client
@@ -39,9 +76,20 @@ class WC_API_Client {
 	 * @param string $store_url store URL, e.g. http://www.woothemes.com
 	 * @param string $consumer_key
 	 * @param string $consumer_secret
-	 * @param array $options client options
+	 * @param array  $options   client options
+	 * @throws Exception
+	 * @throws WC_API_Client_Exception
 	 */
 	public function __construct( $store_url, $consumer_key, $consumer_secret, $options = array() ) {
+
+		// required functions
+		if ( ! extension_loaded( 'curl' ) ) {
+			throw new Exception( 'WooCommerce REST API client requires the cURL PHP extension.' );
+		}
+
+		if ( ! extension_loaded( 'json' ) ) {
+			throw new Exception( 'WooCommerce REST API client needs the JSON extension.' );
+		}
 
 		// set required info
 		$this->store_url = $store_url;
@@ -71,18 +119,23 @@ class WC_API_Client {
 	public function init_resources() {
 
 		$resources = array(
-			//'WC_API_Client_Index' => 'index',
-			'WC_API_Client_Orders'         => 'orders',
-			//'WC_API_Order_Statuses' => 'order_statuses',
-			//'WC_API_Order_Notes'    => 'order_notes',
-			//'WC_API_Order_Refunds'  => 'order_refunds',
-			'WC_API_Client_Products'       => 'products',
-			// ...etc
+			'WC_API_Client_Resource_Coupons'       => 'coupons',
+			'WC_API_Client_Resource_Custom'        => 'custom',
+			'WC_API_Client_Resource_Customers'     => 'customers',
+			'WC_API_Client_Resource_Index'         => 'index',
+			'WC_API_Client_Resource_Orders'        => 'orders',
+			'WC_API_Client_Resource_Order_Notes'   => 'order_notes',
+			'WC_API_Client_Resource_Order_Refunds' => 'order_refunds',
+			'WC_API_Client_Resource_Products'      => 'products',
+			'WC_API_Client_Resource_Reports'       => 'reports',
+			'WC_API_Client_Resource_Webhooks'      => 'webhooks',
 		);
 
 		foreach ( $resources as $resource_class => $resource_method ) {
 
-			$this->$resource_method = new $resource_class( $this );
+			if ( class_exists( $resource_class ) ) {
+				$this->$resource_method = new $resource_class( $this );
+			}
 		}
 	}
 
@@ -119,7 +172,7 @@ class WC_API_Client {
 	/**
 	 * Parse client options, current available options are:
 	 *
-	 * `verbose_mode` - true to include HTTP body, code, headers, and duration in response
+	 * `debug` - true to include cURL log, HTTP request object, and HTTP response object in result
 	 * `return_as_array` - true to return the response as an associative array instead of object
 	 * `validate_url` - true to validate the API URL is correct before making API calls
 	 *
@@ -134,13 +187,19 @@ class WC_API_Client {
 	public function parse_options( $options ) {
 
 		$valid_options = array(
-			'verbose_mode',
+			'debug',
 			'return_as_array',
 			'validate_url',
 			'timeout',
+			'ssl_verify',
 		);
 
 		foreach ( (array) $options as $opt_key => $opt_value ) {
+
+			// backwards compat
+			if ( 'verbose_mode' === $opt_key ) {
+				$opt_key = 'debug';
+			}
 
 			if ( ! in_array( $opt_key, $valid_options ) ) {
 				continue;
@@ -171,11 +230,15 @@ class WC_API_Client {
 		}
 
 		// older versions of WC (2.0 and under) will simply return a "1"
-		if ( "1" === $index ) {
+		if ( '1' === $index ) {
 			throw new WC_API_Client_Exception( sprintf( 'Please upgrade the WooCommerce version on %s to v2.2 or greater.', $this->api_url ) );
 		}
 
-		$index = json_decode( $index );
+		// strip invalid leading/trailing characters from JSON
+		$json_start = strpos( $index, '{' );
+		$json_end = strrpos( $index, '}' ) + 1; // inclusive
+
+		$index = json_decode( substr( $index, $json_start, ( $json_end - $json_start ) ) );
 
 		// check for invalid JSON, an error here usually means:
 		// 1) there's some garbage in the JSON output, WP Super Cache is notorious for adding an HTML comment to non-cached pages
@@ -199,36 +262,29 @@ class WC_API_Client {
 	 * @since 2.0
 	 * @param string $method HTTP method, e.g. GET
 	 * @param string $path request path, e.g. orders/123
-	 * @param array $data request data, either query parameters or the request body
+	 * @param array $request_data either query parameters or the request body
 	 * @return object|array object by default
 	 * @throws WC_API_Client_Exception HTTP or authentication errors
 	 */
-	public function make_api_call( $method, $path, $data ) {
+	public function make_api_call( $method, $path, $request_data ) {
 
-		$endpoint = $this->api_url . $path;
+		$args = array(
+			'method'          => $method,
+			'url'             => $this->api_url . $path,
+			'data'            => $request_data,
+			'consumer_key'    => $this->consumer_key,
+			'consumer_secret' => $this->consumer_secret,
+			'options'         => array(
+				'timeout'     => $this->timeout,
+				'ssl_verify'  => $this->ssl_verify,
+				'json_decode' => $this->return_as_array ? 'array' : 'object',
+				'debug'       => $this->debug,
+			)
+		);
 
-		$auth = new WC_API_Client_Authentication( $endpoint, $this->consumer_key, $this->consumer_secret );
+		$request = new WC_API_Client_HTTP_Request( $args );
 
-		$request = new WC_API_Client_HTTP_Request( $method, $endpoint, $data, $auth );
-
-		$response = $request->dispatch();
-
-		$data = json_decode( $response['body'], $this->return_as_array );
-
-		// add HTTP info to object
-		if ( $this->verbose_mode ) {
-
-			$http           = new stdClass();
-			$http->url      = $response['url'];
-			$http->body     = $response['body'];
-			$http->code     = $response['code'];
-			$http->headers  = $response['headers'];
-			$http->duration = $response['duration'];
-
-			$this->return_as_array ? $data['http'] = (array) $http : $data->http = $http;
-		}
-
-		return $data;
+		return $request->dispatch();
 	}
 
 

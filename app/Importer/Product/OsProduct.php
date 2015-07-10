@@ -31,9 +31,14 @@ class OsProduct extends Model
         return $this->hasOne(OsProductDescription::class, 'products_id', 'products_id');
     }
 
-    public function attibutes()
+    public function attributes()
     {
         return $this->hasMany(OsProductAttribute::class, 'products_id', 'products_id');
+    }
+
+    public function upSells()
+    {
+        return $this->hasMany(OsProductXsell::class,'products_id', 'products_id');
     }
 
     public function toWooCommerce()
