@@ -25,7 +25,8 @@ class ProductController extends Controller
     public function index()
     {
 
-        //ImportedProduct::truncate();
+        ImportedProduct::truncate();
+	    ErrorProduct::truncate();
         JavaScript::put([
             'url' => '/products',
             'os_total' => OsProduct::count(),
@@ -47,22 +48,23 @@ class ProductController extends Controller
      * @param Store $store
      * @return Response
      */
-    public function import()//Store $store
+    public function import(Store $store)
     {
-        return ['success' => rand(0,1), 'message' => Factory::create()->text(100)];
-
+//        return ['success' => rand(0,1), 'message' => Factory::create()->text(100)];
+	    $product = OsProduct::findOrFail(Input::get('resource_id'));
         try {
-            $product = OsProduct::findOrFail(Input::get('product_id'));
+
 
             $result = $store->createProduct($product->toWooCommerce());
+
             if (isset($result->product)) {
-                $imported = ImportedProduct::create([
+                ImportedProduct::create([
                     'os_id' => $product->products_id,
-                    'name' => $product->description->title,
+                    'name' => $result->product->title,
                     'wc_id' => $result->product->id
                 ]);
 
-                return ['success' => 1, 'message' => "Product '{$product->description->title}',  os_id:'{$product->products_id}' imported successfully"];
+                return ['success' => 1, 'message' => "Product '{$result->product->title}',  os_id:'{$product->products_id}' imported successfully"];
             }
         } catch (Exception $e) {
             ErrorProduct::create([
@@ -73,7 +75,7 @@ class ProductController extends Controller
 
             return [
                 'success' => 0,
-                'message' => "Product '{$product->description->title}',  os_id:'{$product->products_id}', Error:". $e->getMessage()
+                'message' => "Product '{$product->description->products_name}',  os_id:'{$product->products_id}', Error:". $e->getMessage()
             ];
         }
 

@@ -23,7 +23,7 @@ class OsProduct extends Model
 
     public function specials()
     {
-        return $this->hasOne(OsProductSpecial::class, 'products_id');
+        return $this->hasOne(OsProductSpecials::class, 'products_id');
     }
 
     public function description()
@@ -45,10 +45,8 @@ class OsProduct extends Model
     {
         return [
             "title" => $this->description->products_name,
-            "type" => 'simple',
-            "status" => $this->products_status ? 'publish' : 'draft',
-            //decided draft because can be seen in backend and not in frontend
-            // default publish
+            "type" => count($this->getOsAttributes())>1 ? 'variable' : 'simple',
+            "status" => $this->products_status ? 'publish' : 'draft',//decided draft because can be seen in backend and not in frontend
             "downloadable" => false,
             "virtual" => false,
             "sku" => $this->products_model,
@@ -87,10 +85,52 @@ class OsProduct extends Model
             //            //download_expiry	integer	Number of days that the customer has up to be able to download the product. In write-mode you can sent a blank string for never expiry. e.g ''
             //            //download_type	string	Download type, this controls the schema. The available options are: '' (Standard Product), application (Application/Software) and music (Music)
             //            //"purchase_note"    => get_post_meta( $order->id, '_purchase_note', true) http://stackoverflow.com/questions/12801713/show-product-name-and-purchase-notes-in-my-accounts-page-in-woo-commerce
-            //            "variations" => $variations,
-            //            "attributes" => $this->getProductAttributes($wc_product)
+                       "variations" => $this->getVariations(),
+                       "attributes" => $this->getWooAttributes()
             //            //"product_url"	string	Product external URL. Only for external products WRITE-ONLY
             //            //"button_text"	string	Product external button text. Only for external products WRITE-ONLY
         ];
     }
+
+	private function getVariations(){
+		$attributes = $this->getOsAttributes();
+		dd($attributes);
+	}
+
+	private function getWooAttributes() {
+		$attributes = $this->getOsAttributes();
+		$allAttr = [];
+		$result = [];
+		$actual = '';
+		$many = 0;
+		foreach($attributes as $attr){
+			if(! $actual){
+				$actual = $attr['name']['products_options_name'];
+				$result['name'] = $actual;
+				$result['slug'] = str_slug($actual);
+				$result['position'] = $many;
+				$result['visible'] = true;
+				$result['variation'] = true;
+				$result['options'] = [];
+     		}elseif($actual !== $attr['name']['products_options_name']){
+				$allAttr[] = $result;
+				$many++;
+				$actual = $attr['name']['products_options_name'];
+				$result['name'] = $actual;
+				$result['slug'] = str_slug($actual);
+				$result['position'] = $many;
+				$result['visible'] = true;
+				$result['variation'] = true;
+				$result['options'] = [];
+			}
+			$result['options'][] = $attr['value']['products_options_values_name'];
+		}
+		$allAttr[] = $result;
+
+		return $allAttr;
+	}
+
+	private function getOsAttributes() {
+		return $this->attributes()->with( 'name', 'value' )->get()->toArray();
+	}
 }

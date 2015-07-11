@@ -18,7 +18,7 @@ class WooCommerceStore implements Store
         $this->consumer_key = $consumer_key;
         $this->consumer_secret = $consumer_secret;
 	    $client = new WC_API_Client( $url, $consumer_key, $consumer_secret );
-	    $this->client = new WC_API_Client_Products( $client );
+	    $this->client = new \WC_API_Client_Resource_Products($client );
     }
 
     public function createCoupon(array $coupon)
