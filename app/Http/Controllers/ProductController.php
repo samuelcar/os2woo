@@ -25,18 +25,18 @@ class ProductController extends Controller
     public function index()
     {
 
-        ImportedProduct::truncate();
-	    ErrorProduct::truncate();
+       ImportedProduct::truncate();
+	   ErrorProduct::truncate();
         JavaScript::put([
             'url' => '/products',
             'os_total' => OsProduct::count(),
             'imported_total' => ImportedProduct::count(),
-            'resource' => array_values(
+            'resource' => [24794] /*array_values(
                 array_diff(OsProduct::lists('products_id')->toArray(),
                     ImportedProduct::lists('os_id')->toArray(),
                     ErrorProduct::lists('os_id')->toArray()
                 )
-            )
+            )*/
         ]);
 
         return view('importer.products');
@@ -54,9 +54,8 @@ class ProductController extends Controller
 	    $product = OsProduct::findOrFail(Input::get('resource_id'));
         try {
 
-
-            $result = $store->createProduct($product->toWooCommerce());
-
+	        $result = $store->createProduct($product->toWooCommerce());
+	        $result = $store->updateProduct($result->product->id, $product->toWooCommerce());
             if (isset($result->product)) {
                 ImportedProduct::create([
                     'os_id' => $product->products_id,

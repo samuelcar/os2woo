@@ -37,6 +37,13 @@ class WooCommerceStore implements Store
         );
     }
 
+	public function updateProduct($id, array $product){
+		return $this->client->update($id,[
+				'product' => $product
+			]
+		);
+	}
+
     public function createCustomer(array $customer)
     {
         
@@ -124,9 +131,9 @@ class WooCommerceStore implements Store
 
     public function getProducts()
     {
-        $result = $this->client->get('products');
+        $result = $this->client->get(1795);
 
-        return $result->json();
+        return $result;
     }
 
 }

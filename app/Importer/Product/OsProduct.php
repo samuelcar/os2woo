@@ -55,7 +55,7 @@ class OsProduct extends Model
             "sale_price_dates_from" => isset($this->specials->start_date) ? $this->specials->start_date : '',
             "sale_price_dates_to" => isset($this->specials->start_date) ? $this->specials->start_date : '',
             "tax_status" => 'taxable',
-            //            "tax_class" => $wc_product->get_tax_class(),
+            "tax_class" => 'standard',
             //            "managing_stock" => $wc_product->managing_stock(), //maybe optional
             "stock_quantity" => intval($this->description->products_quantity),
             "in_stock" => (bool) $this->products_inStock,
@@ -79,58 +79,96 @@ class OsProduct extends Model
             'images' => [
                 ['src' => $this->image_path . $this->products_image, 'position' => 0]
             ],
-            //            "default_attributes" => $default_attr,
+           // "default_attributes" => $this->getDefaultWooAttribute(),
             //            //"downloads" this can be tricky to many variables. can be public?downloads	array	List of downloadable files. See Downloads Properties
             //            //download_limit	integer	Amount of times the product can be downloaded. In write-mode you can sent a blank string for unlimited re-downloads. e.g ''
             //            //download_expiry	integer	Number of days that the customer has up to be able to download the product. In write-mode you can sent a blank string for never expiry. e.g ''
             //            //download_type	string	Download type, this controls the schema. The available options are: '' (Standard Product), application (Application/Software) and music (Music)
             //            //"purchase_note"    => get_post_meta( $order->id, '_purchase_note', true) http://stackoverflow.com/questions/12801713/show-product-name-and-purchase-notes-in-my-accounts-page-in-woo-commerce
-                       "variations" => $this->getVariations(),
-                       "attributes" => $this->getWooAttributes()
+            "attributes" => $this->getWooAttributes(),
+            "variations" => $this->getVariations()
             //            //"product_url"	string	Product external URL. Only for external products WRITE-ONLY
             //            //"button_text"	string	Product external button text. Only for external products WRITE-ONLY
         ];
     }
 
-	private function getVariations(){
-		$attributes = $this->getOsAttributes();
-		dd($attributes);
+	public function getVariations(){
+
+		$attributes = $this->getWooAttributes();
+		$variations = [];
+		$actual = [];
+		if (count($attributes) == 1){
+			$current = $attributes[0];
+			$options = isset($current['options']) ? $current['options'] : [];
+			foreach ( $options as $opt ) {
+				$actual['regular_price'] = $this->products_price;
+				$actual["sale_price"] = isset($this->specials->specials_new_products_price) ? $this->specials->specials_new_products_price : '';
+				$actual["sale_price_dates_from"] = isset($this->specials->start_date) ? $this->specials->start_date : '';
+				$actual["attributes"] = [
+					[
+					"name" => $current['name'],
+					"slug" => $current['slug'],
+					"option" => trim($opt)
+					]
+				];
+				$variations[] = $actual;
+			}
+    	}
+
+	return $variations;
+
 	}
 
-	private function getWooAttributes() {
+	public function getDefaultWooAttribute(){
+		$attributes = $this->getWooAttributes();
+			$actual = [];
+		if (count($attributes) == 1){
+			$current = $attributes[0];
+			$options = isset($current['options']) ? $current['options'] : [];
+			foreach ( $options as $opt ) {
+				$actual['default_attributes'] = [
+					[
+						'name' => $current['name'],
+						'slug' => $current['slug'],
+						'option' => $opt
+					]
+				];
+				break;
+			}
+		}
+
+		return $actual['default_attributes'];
+	}
+
+	public function getWooAttributes() {
 		$attributes = $this->getOsAttributes();
 		$allAttr = [];
 		$result = [];
 		$actual = '';
 		$many = 0;
 		foreach($attributes as $attr){
-			if(! $actual){
+     		if($actual !== $attr['name']['products_options_name']){
+				if($actual!=''){
+					$allAttr[] = $result;
+					$many++;
+				}
 				$actual = $attr['name']['products_options_name'];
 				$result['name'] = $actual;
 				$result['slug'] = str_slug($actual);
 				$result['position'] = $many;
-				$result['visible'] = true;
-				$result['variation'] = true;
-				$result['options'] = [];
-     		}elseif($actual !== $attr['name']['products_options_name']){
-				$allAttr[] = $result;
-				$many++;
-				$actual = $attr['name']['products_options_name'];
-				$result['name'] = $actual;
-				$result['slug'] = str_slug($actual);
-				$result['position'] = $many;
-				$result['visible'] = true;
+				$result['visible'] = false;
 				$result['variation'] = true;
 				$result['options'] = [];
 			}
 			$result['options'][] = $attr['value']['products_options_values_name'];
 		}
-		$allAttr[] = $result;
-
+		if(!empty($result)){
+			$allAttr[] = $result;
+		}
 		return $allAttr;
 	}
 
-	private function getOsAttributes() {
+	public function getOsAttributes() {
 		return $this->attributes()->with( 'name', 'value' )->get()->toArray();
 	}
 }

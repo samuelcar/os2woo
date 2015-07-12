@@ -35,4 +35,6 @@ interface Store
     public function getOrders($filter = null);
 
     public function getProducts();
+
+	public function updateProduct($id, array $product);
 }
