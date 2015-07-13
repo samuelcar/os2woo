@@ -44,7 +44,9 @@ class WooCommerceStore implements Store
 
     public function updateProduct($id, array $product)
     {
-        return $this->client->update($id, [
+	    $client = new WC_API_Client_Resource_Products($this->client);
+
+	    return $client->update($id, [
                 'product' => $product
             ]
         );
@@ -62,7 +64,12 @@ class WooCommerceStore implements Store
 
     public function createOrder(array $order)
     {
+	    $client = new \WC_API_Client_Resource_Orders($this->client);
 
+	    return $client->create([
+			    'order' => $order
+		    ]
+	    );
     }
 
     public function getCoupon($id)

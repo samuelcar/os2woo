@@ -16,7 +16,7 @@ class CreateImportedCustomersTable extends Migration
             $table->increments('id');
             $table->integer('os_id');
             $table->string('email');
-            $table->integer('woo_id');
+            $table->integer('wc_id');
             $table->timestamps();
         });
     }

@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Importer\Customer;
+namespace App\Importer\Order;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ErrorCustomer extends Model
+class ErrorOrder extends Model
 {
 	protected $guarded = ['id'];
 }

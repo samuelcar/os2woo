@@ -32,7 +32,7 @@ function wp_generate_password( $length = 12, $special_chars = true, $extra_speci
 
     $password = '';
     for ( $i = 0; $i < $length; $i++ ) {
-        $password .= substr($chars, wp_rand(0, strlen($chars) - 1), 1);
+        $password .= substr($chars,rand(0, strlen($chars) - 1), 1);
     }
     return $password;
 }

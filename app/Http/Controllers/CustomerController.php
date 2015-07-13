@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Contracts\Store;
 use App\Importer\Customer\ErrorCustomer;
 use App\Importer\Customer\ImportedCustomer;
-use App\Importer\Customer\OsCostumer;
+use App\Importer\Customer\OsCustomer;
 use Exception;
 
 use App\Http\Requests;
@@ -24,13 +24,14 @@ class CustomerController extends Controller
     public function index()
     {
 
-        //ImportedProduct::truncate();
+//	    ImportedCustomer::truncate();
+//	    ErrorCustomer::truncate();
         JavaScript::put([
             'url' => '/customers',
-            'os_total' => OsCostumer::count(),
+            'os_total' => OsCustomer::count(),
             'imported_total' => ImportedCustomer::count(),
             'resource' => array_values(
-                array_diff(OsCostumer::lists('customers_id')->toArray(),
+                array_diff(OsCustomer::lists('customers_id')->toArray(),
                     ImportedCustomer::lists('os_id')->toArray(),
                     ErrorCustomer::lists('os_id')->toArray()
                 )
@@ -55,17 +56,17 @@ class CustomerController extends Controller
             $result = $store->createCustomer($customer->toWooCommerce());
             if (isset($result->customer)) {
                 $imported = ImportedCustomer::create([
-                    'os_id' => $customer->id,
-                    'name' => $result->customer->title,
+                    'os_id' => $customer->customers_id,
+                    'email' => $result->customer->email,
                     'wc_id' => $result->customer->id
                 ]);
 
-                return ['success' => 1, 'message' => "Customer '{$imported['name']}' imported successfully"];
+                return ['success' => 1, 'message' => "Customer '{$imported['email']}' imported successfully"];
             }
         } catch (Exception $e) {
             ErrorCustomer::create([
-                'os_id' => $customer->id,
-                'name' => $customer->description->customers_name,
+                'os_id' => $customer->customers_id,
+                'email' => $customer->customers_email_address,
                 'error' => $e->getMessage()
             ]);
 

@@ -79,6 +79,7 @@ new Vue({
     },
     methods: {
         work: function () {
+            var total = this.working ? 1 : (this.to_import < 5 ? this.to_import : 5);
             if (!this.working) {
                 if (this.finished) {
                     this.imported = 0;
@@ -86,14 +87,12 @@ new Vue({
                 }
                 this.working = true;
             }
-            var total = this.working ? 1 : (this.to_import < 5 ? this.to_import : 5);
             var vm = this;
 
             clocktimer = setInterval(function () {
                 vm.time = formatTime(x.time());
             }, 1);
             x.start();
-
             for (var i = 0; i < total; i++) {
                 vm.to_import--;
                 $.post(importer.url, {resource_id: this.resource.shift()}, function (data) {
