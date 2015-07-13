@@ -3,6 +3,8 @@
 use App\Contracts\Store;
 use WC_API_Client;
 use WC_API_Client_Products;
+use WC_API_Client_Resource_Customers;
+use WC_API_Client_Resource_Products;
 
 class WooCommerceStore implements Store
 {
@@ -17,8 +19,8 @@ class WooCommerceStore implements Store
         $this->url = $url;
         $this->consumer_key = $consumer_key;
         $this->consumer_secret = $consumer_secret;
-	    $client = new WC_API_Client( $url, $consumer_key, $consumer_secret );
-	    $this->client = new \WC_API_Client_Resource_Products($client );
+        $this->client = new WC_API_Client($url, $consumer_key, $consumer_secret);
+
     }
 
     public function createCoupon(array $coupon)
@@ -29,29 +31,38 @@ class WooCommerceStore implements Store
             ]
         ]);
     }
-    
-    public function createProduct(array $product){
-        return $this->client->create([
+
+    public function createProduct(array $product)
+    {
+        $client = new WC_API_Client_Resource_Products($this->client);
+
+        return $client->create([
                 'product' => $product
             ]
         );
     }
 
-	public function updateProduct($id, array $product){
-		return $this->client->update($id,[
-				'product' => $product
-			]
-		);
-	}
+    public function updateProduct($id, array $product)
+    {
+        return $this->client->update($id, [
+                'product' => $product
+            ]
+        );
+    }
 
     public function createCustomer(array $customer)
     {
-        
+        $client = new WC_API_Client_Resource_Customers($this->client);
+
+        return $client->create([
+                'customer' => $customer
+            ]
+        );
     }
 
     public function createOrder(array $order)
     {
-        
+
     }
 
     public function getCoupon($id)

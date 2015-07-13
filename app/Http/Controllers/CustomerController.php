@@ -46,26 +46,26 @@ class CustomerController extends Controller
      * @param Store $store
      * @return Response
      */
-    public function import(/*Store $store*/)
+    public function import(Store $store)
     {
-        return ['success' => rand(0,1), 'message' => Factory::create()->text(100)];
+//        return ['success' => rand(0,1), 'message' => Factory::create()->text(100)];
         try {
-            $product = OsCustomer::findOrFail(Input::get('resource_id'));
+            $customer = OsCustomer::findOrFail(Input::get('resource_id'));
 
-            $result = $store->createCustomer($product->toWooCommerce());
-            if (isset($result->product)) {
+            $result = $store->createCustomer($customer->toWooCommerce());
+            if (isset($result->customer)) {
                 $imported = ImportedCustomer::create([
-                    'os_id' => $product->id,
-                    'name' => $result->product->title,
-                    'wc_id' => $result->product->id
+                    'os_id' => $customer->id,
+                    'name' => $result->customer->title,
+                    'wc_id' => $result->customer->id
                 ]);
 
                 return ['success' => 1, 'message' => "Customer '{$imported['name']}' imported successfully"];
             }
         } catch (Exception $e) {
             ErrorCustomer::create([
-                'os_id' => $product->id,
-                'name' => $product->description->customers_name,
+                'os_id' => $customer->id,
+                'name' => $customer->description->customers_name,
                 'error' => $e->getMessage()
             ]);
 

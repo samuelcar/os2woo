@@ -2,6 +2,7 @@
 
 namespace App\Importer\Product;
 
+use App\Contracts\ToWooCommerce;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -13,7 +14,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property mixed products_inStock
  * @property mixed products_image
  */
-class OsProduct extends Model
+class OsProduct extends Model implements ToWooCommerce
 {
 
     protected $connection = 'oscommerce';
