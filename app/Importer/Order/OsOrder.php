@@ -10,6 +10,24 @@ use Illuminate\Database\Eloquent\Model;
  * @property mixed status
  * @property mixed currency
  * @property mixed customers_id
+ * @property mixed billing_name
+ * @property mixed billing_company
+ * @property mixed billing_street_address
+ * @property mixed billing_suburb
+ * @property mixed billing_city
+ * @property mixed billing_state
+ * @property mixed billing_postcode
+ * @property mixed billing_country
+ * @property mixed customers_email_address
+ * @property mixed customers_telephone
+ * @property mixed delivery_name
+ * @property mixed delivery_company
+ * @property mixed delivery_street_address
+ * @property mixed delivery_suburb
+ * @property mixed delivery_city
+ * @property mixed delivery_state
+ * @property mixed delivery_postcode
+ * @property mixed delivery_country
  */
 class OsOrder extends Model implements ToWooCommerce {
 
@@ -18,90 +36,87 @@ class OsOrder extends Model implements ToWooCommerce {
 	protected $primaryKey = 'orders_id';
 
 	public function status() {
-		return $this->hasOne( OsOrderStatus::class, 'orders_status', 'orders_status_id' );
+		return $this->hasOne( OsOrderStatus::class, 'orders_status_id', 'orders_status' );
+	}
+
+	public function products() {
+		return $this->hasMany( OsOrderProduct::class, 'orders_id', 'orders_id' );
 	}
 
 
 	public function toWooCommerce() {
 		return [
-			'order_number' => $this->orders_id,
-			'status'       => $this->getOrderStatus(),
-			'currency'     => $this->currency,
-            'payment_details' => [
-                'method_id' => '',
-                'method_title' => '',
-                'paid' => true, // or false
-                'transaction_id' => 'no idea'
-            ],
-            'billing_address'=> [
-
-            ],
-            'shipping_address' => [],
-            'note' => '',
-            'customer_id' => $this->customers_id,
-            'line_items' => $this->getLineItems(),
-            'shipping_lines' => [],
-            'fee_lines' => [],
-            'coupon_lines' => [],
-            'customer' => []
+			'order_number'     => $this->orders_id,
+			'status'           => $this->getOrderStatus(),
+			'currency'         => $this->currency,
+			'payment_details'  => [
+				'method_id'      => '',
+				'method_title'   => '',
+				'paid'           => true, // or false
+				'transaction_id' => 'no idea'
+			],
+			'billing_address'  => [
+				'first_name' => $this->getFirstName( $this->billing_name ),
+				'last_name'  => $this->getLastName( $this->billing_name ),
+				'company'    => $this->billing_company,
+				'address_1'  => $this->billing_street_address,
+				'address_2'  => $this->billing_suburb,
+				'city'       => $this->billing_city,
+				'state'      => $this->billing_state,
+				'postcode'   => $this->billing_postcode,
+				'country'    => $this->billing_country,
+				'email'      => $this->customers_email_address,
+				'phone'      => $this->customers_telephone,
+			],
+			'shipping_address' => [
+				'first_name' => $this->getFirstName( $this->delivery_name ),
+				'last_name'  => $this->getLastName( $this->delivery_name ),
+				'company'    => $this->delivery_company,
+				'address_1'  => $this->delivery_street_address,
+				'address_2'  => $this->delivery_suburb,
+				'city'       => $this->delivery_city,
+				'state'      => $this->delivery_state,
+				'postcode'   => $this->delivery_postcode,
+				'country'    => $this->delivery_country,
+			],
+			'note'             => '',
+			'customer_id'      => $this->customers_id,
+			'line_items'       => $this->getLineItems(),
+			'shipping_lines'   => $this->getShippingLines(),
+			'fee_lines'        => [ ],
+			'coupon_lines'     => [ ],
+			'customer'         => [ ]
 
 		];
 
-		/*		Orders Properties
-		Payment Details Properties
-		Line Items Properties
-
-		Attribute	Type	Description
-		id	integer	Line item ID READ-ONLY
-		subtotal	float	Line item subtotal
-		subtotal_tax	float	Line item tax subtotal
-		total	float	Line item total
-		total_tax	float	Line item tax total
-		price	float	Product price READ-ONLY
-		quantity	integer	Quantity
-		tax_class	string	Product tax class READ-ONLY
-		name	string	Product name READ-ONLY
-		product_id	integer	Product ID REQUIRED
-		sku	string	Product SKU READ-ONLY
-		meta	array	List of product meta items. See Products Meta Items Properties
-		variations	array	List of product variation attributes. e.g: "variation": {"pa_color": "Black", "pa_size": "XGG"} (Use pa_ prefix when is a product attribute) WRITE-ONLY
-		Products Meta Items Properties
-
-		Attribute	Type	Description
-		key	string	Meta item key
-		label	string	Meta item label
-		value	string	Meta item value
-		Shipping Lines Properties
-
-		Attribute	Type	Description
-		id	integer	Shipping line ID READ-ONLY
-		method_id	string	Shipping method ID REQUIRED
-		method_title	string	Shipping method title REQUIRED
-		total	float	Total amount
-		Tax Lines Properties
-
-		Attribute	Type	Description
-		id	integer	Tax rate line ID READ-ONLY
-		rate_id	integer	Tax rate ID READ-ONLY
-		code	string	Tax rate code READ-ONLY
-		title	string	Tax rate title/name READ-ONLY
-		total	float	Tax rate total READ-ONLY
-		compound	boolean	Shows if is or not a compound rate. Compound tax rates are applied on top of other tax rates. READ-ONLY
-		Fee Lines Properites
-
-		Attribute	Type	Description
-		id	integer	Fee line ID READ-ONLY
-		title	string	Shipping method title REQUIRED
-		taxable	boolean	Shows/define if the fee is taxable WRITE-ONLY
-		tax_class	string	Tax class, requered in write-mode if the fee is taxable
-		total	float	Total amount
-		total_tax	float	Tax total
-		Coupon Lines Properties
-
-		Attribute	Type	Description
-		id	integer	Coupon line ID READ-ONLY
-		code	string	Coupon code REQUIRED
-		amount	float	Total amount REQUIRED*/
+		/**
+		 * Shipping Lines Properties
+		 * Attribute    Type    Description
+		 * id    integer    Shipping line ID READ-ONLY
+		 * method_id    string    Shipping method ID REQUIRED
+		 * method_title    string    Shipping method title REQUIRED
+		 * total    float    Total amount
+		 * Tax Lines Properties
+		 * Attribute    Type    Description
+		 * id    integer    Tax rate line ID READ-ONLY
+		 * rate_id    integer    Tax rate ID READ-ONLY
+		 * code    string    Tax rate code READ-ONLY
+		 * title    string    Tax rate title/name READ-ONLY
+		 * total    float    Tax rate total READ-ONLY
+		 * compound    boolean    Shows if is or not a compound rate. Compound tax rates are applied on top of other tax rates. READ-ONLY
+		 * Fee Lines Properites
+		 * Attribute    Type    Description
+		 * id    integer    Fee line ID READ-ONLY
+		 * title    string    Shipping method title REQUIRED
+		 * taxable    boolean    Shows/define if the fee is taxable WRITE-ONLY
+		 * tax_class    string    Tax class, requered in write-mode if the fee is taxable
+		 * total    float    Total amount
+		 * total_tax    float    Tax total
+		 * Coupon Lines Properties
+		 * Attribute    Type    Description
+		 * id    integer    Coupon line ID READ-ONLY
+		 * code    string    Coupon code REQUIRED
+		 * amount    float    Total amount REQUIRED*/
 	}
 
 	private function getOrderStatus() {
@@ -136,7 +151,33 @@ class OsOrder extends Model implements ToWooCommerce {
 
 	}
 
-    private function getPaymentDetails() { }
+	public function getLineItems() {
+		$items       = [ ];
+		$allProducts = $this->products()->with( 'attributes' )->get()->toArray();
+		foreach ( $allProducts as $product ) {
+			$items[] = [
+				'total'      => $product['products_price'],
+				'total_tax'  => ( $product['products_price'] * ( $product['products_tax'] / 100 ) ),
+				'quantity'   => $product['products_quantity'],
+				'product_id' => $product['products_id'],
+				'variations' => empty( $product['attributes'] ) ? [ ] : [
+					"pa_" . strtolower( $product['attributes']['products_options'] ) => $product['attributes']['products_options_values']
+				]
+			];
+		}
 
-    private function getLineItems() { }
+		return $items;
+	}
+
+	public function getFirstName( $name ) {
+		return current( explode( ' ', $name ) );
+	}
+
+	public function getLastName( $name ) {
+		return last( explode( ' ', $name ) );
+	}
+
+	private function getShippingLines() {
+
+	}
 }
