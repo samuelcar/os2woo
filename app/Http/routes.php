@@ -6,15 +6,18 @@ get('/', function () {
 });
 
 get('/changemail', function(){
-	$customers = OsCustomer::all();
+	$customers = OsCustomer::where('customers_id','<',25000)->where('customers_id','>',19999)->get();
 	$faker = new \Faker\Factory();
 
 	foreach($customers as $customer ){
 		$customer->customers_email_address = $faker->create()->email;
+		$customer->customers_firstname = $faker->create()->firstName;
+		$customer->customers_lastname = $faker->create()->lastName;
 		$customer->save();
-		echo $customer->customers_email_address.'<br>';
 	}
+	echo "done";
 });
+
 post('products', 'ProductController@import');
 post('customers', 'CustomerController@import');
 post('orders', 'OrderController@import');
