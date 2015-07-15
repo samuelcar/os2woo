@@ -3,6 +3,7 @@
 namespace App\Importer\Order;
 
 use App\Contracts\ToWooCommerce;
+use App\Importer\Customer\ImportedCustomer;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -43,6 +44,10 @@ class OsOrder extends Model implements ToWooCommerce {
 		return $this->hasMany( OsOrderProduct::class, 'orders_id', 'orders_id' );
 	}
 
+	public function total() {
+		return $this->hasMany( OsOrderTotal::class, 'orders_id', 'orders_id' );
+	}
+
 
 	public function toWooCommerce() {
 		return [
@@ -80,43 +85,14 @@ class OsOrder extends Model implements ToWooCommerce {
 				'country'    => $this->delivery_country,
 			],
 			'note'             => '',
-			'customer_id'      => $this->customers_id,
+			'customer_id'      => $this->getWooCustomerId(),
 			'line_items'       => $this->getLineItems(),
 			'shipping_lines'   => $this->getShippingLines(),
 			'fee_lines'        => [ ],
-			'coupon_lines'     => [ ],
+			'coupon_lines'     => $this->getCouponLines(),
 			'customer'         => [ ]
 
 		];
-
-		/**
-		 * Shipping Lines Properties
-		 * Attribute    Type    Description
-		 * id    integer    Shipping line ID READ-ONLY
-		 * method_id    string    Shipping method ID REQUIRED
-		 * method_title    string    Shipping method title REQUIRED
-		 * total    float    Total amount
-		 * Tax Lines Properties
-		 * Attribute    Type    Description
-		 * id    integer    Tax rate line ID READ-ONLY
-		 * rate_id    integer    Tax rate ID READ-ONLY
-		 * code    string    Tax rate code READ-ONLY
-		 * title    string    Tax rate title/name READ-ONLY
-		 * total    float    Tax rate total READ-ONLY
-		 * compound    boolean    Shows if is or not a compound rate. Compound tax rates are applied on top of other tax rates. READ-ONLY
-		 * Fee Lines Properites
-		 * Attribute    Type    Description
-		 * id    integer    Fee line ID READ-ONLY
-		 * title    string    Shipping method title REQUIRED
-		 * taxable    boolean    Shows/define if the fee is taxable WRITE-ONLY
-		 * tax_class    string    Tax class, requered in write-mode if the fee is taxable
-		 * total    float    Total amount
-		 * total_tax    float    Tax total
-		 * Coupon Lines Properties
-		 * Attribute    Type    Description
-		 * id    integer    Coupon line ID READ-ONLY
-		 * code    string    Coupon code REQUIRED
-		 * amount    float    Total amount REQUIRED*/
 	}
 
 	private function getOrderStatus() {
@@ -151,7 +127,7 @@ class OsOrder extends Model implements ToWooCommerce {
 
 	}
 
-	public function getLineItems() {
+	private function getLineItems() {
 		$items       = [ ];
 		$allProducts = $this->products()->with( 'attributes' )->get()->toArray();
 		foreach ( $allProducts as $product ) {
@@ -169,15 +145,47 @@ class OsOrder extends Model implements ToWooCommerce {
 		return $items;
 	}
 
-	public function getFirstName( $name ) {
+	private function getFirstName( $name ) {
 		return current( explode( ' ', $name ) );
 	}
 
-	public function getLastName( $name ) {
+	private function getLastName( $name ) {
 		return last( explode( ' ', $name ) );
 	}
 
 	private function getShippingLines() {
+		$items  = [ ];
+		$totals = $this->total()->get()->toArray();
+		foreach ( $totals as $tot ) {
+			if ( $tot['class'] === 'ot_shipping' ) {
+				$method  = preg_replace( '/\s\(.*|:/', '', $tot['title'] );
+				$items[] = [
+					'method_id'    => str_slug( $method, '_' ),
+					'method_title' => $method,
+					'total'        => $tot['value']
+				];
+			}
+		}
 
+		return $items;
+	}
+
+	private function getCouponLines() {
+		$items  = [ ];
+		$totals = $this->total()->get()->toArray();
+		foreach ( $totals as $tot ) {
+			if ( $tot['class'] === 'ot_redemptions' ) {
+				$items[] = [
+					'code'   => 'Points Redeemed',
+					'amount' => $tot['value']
+				];
+			}
+		}
+
+		return $items;
+	}
+
+	private function getWooCustomerId() {
+		$customer = ImportedCustomer::where('os_id','=',$this->customers_id)->get()->first();
 	}
 }
