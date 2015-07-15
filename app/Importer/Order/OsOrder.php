@@ -4,6 +4,8 @@ namespace App\Importer\Order;
 
 use App\Contracts\ToWooCommerce;
 use App\Importer\Customer\ImportedCustomer;
+use App\Importer\Product\ImportedProduct;
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -135,7 +137,7 @@ class OsOrder extends Model implements ToWooCommerce {
 				'total'      => $product['products_price'],
 				'total_tax'  => ( $product['products_price'] * ( $product['products_tax'] / 100 ) ),
 				'quantity'   => $product['products_quantity'],
-				'product_id' => $product['products_id'],
+				'product_id' => $this->getWooProductId($product['products_id']),
 				'variations' => empty( $product['attributes'] ) ? [ ] : [
 					"pa_" . strtolower( $product['attributes']['products_options'] ) => $product['attributes']['products_options_values']
 				]
@@ -191,6 +193,15 @@ class OsOrder extends Model implements ToWooCommerce {
 			return $customer['wc_id'];
 		}
 
-		throw new \Exception("the customer has not been imported yet.");
+		throw new Exception("the customer has not been imported yet.");
+	}
+
+	private function getWooProductId($id) {
+		$customer = ImportedProduct::where('os_id','=',$id)->get()->first();
+		if(isset($customer['wc_id'])){
+			return $customer['wc_id'];
+		}
+
+		throw new Exception("the product has not been imported yet.");
 	}
 }

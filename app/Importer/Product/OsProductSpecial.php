@@ -4,7 +4,7 @@ namespace App\Importer\Product;
 
 use Illuminate\Database\Eloquent\Model;
 
-class OsProductSpecials extends Model
+class OsProductSpecial extends Model
 {
     protected $connection = 'oscommerce';
     protected $table = 'specials';

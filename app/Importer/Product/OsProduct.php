@@ -24,7 +24,7 @@ class OsProduct extends Model implements ToWooCommerce
 
     public function specials()
     {
-        return $this->hasOne(OsProductSpecials::class, 'products_id');
+        return $this->hasOne(OsProductSpecial::class, 'products_id');
     }
 
     public function description()

@@ -19,11 +19,6 @@ class OrderController extends Controller
 
 		//	    ImportedOrder::truncate();
 		//	    ErrorOrder::truncate();
-		ImportedCustomer::create([
-			'os_id' => 19806,
-			'email' => 'samucar@gmail.com',
-			'wc_id' => 19806
-		]);
 
 		JavaScript::put([
 			'url' => '/orders',
