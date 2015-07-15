@@ -74,7 +74,7 @@ class ProductController extends Controller
 
             return [
                 'success' => 0,
-                'message' => "Product '{$product->description->products_name}',  os_id:'{$product->products_id}', Error:". $e->getMessage()
+                'message' => "Product '{$product->description->products_name}',  os_id:'{$product->products_id}',". $e->getMessage()
             ];
         }
 

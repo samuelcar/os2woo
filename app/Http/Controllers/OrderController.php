@@ -2,14 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Contracts\Store;
 use App\Importer\Customer\ImportedCustomer;
 use App\Importer\Order\ErrorOrder;
 use App\Importer\Order\ImportedOrder;
 use App\Importer\Order\OsOrder;
+use Exception;
 use Illuminate\Http\Request;
+
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use Faker\Factory;
+use Illuminate\Support\Facades\Input;
 use JavaScript;
 
 class OrderController extends Controller
@@ -51,22 +56,22 @@ class OrderController extends Controller
 			if (isset($result->order)) {
 				$imported = ImportedOrder::create([
 					'os_id' => $order->orders_id,
-					'email' => $result->order->email,
+					'email' => $order->customers_email_address,
 					'wc_id' => $result->order->id
 				]);
 
-				return ['success' => 1, 'message' => "Order '{$imported['email']}' imported successfully"];
+				return ['success' => 1, 'message' => "Order '{$imported['os_id']}' imported successfully"];
 			}
 		} catch (Exception $e) {
 			ErrorOrder::create([
 				'os_id' => $order->orders_id,
-				'email' => $order->orders_email_address,
+				'email' => $order->customers_email_address,
 				'error' => $e->getMessage()
 			]);
 
 			return [
 				'success' => 0,
-				'message' => $e->getMessage()
+				'message' => 'Order id:'.$order->orders_id." ". $e->getMessage()
 			];
 		}
 

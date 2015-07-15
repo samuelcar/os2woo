@@ -157,7 +157,7 @@ class OsProduct extends Model implements ToWooCommerce
 				$result['name'] = $actual;
 				$result['slug'] = str_slug($actual);
 				$result['position'] = $many;
-				$result['visible'] = false;
+				$result['visible'] = count($attributes) > 1 ? false : true;
 				$result['variation'] = true;
 				$result['options'] = [];
 			}

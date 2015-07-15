@@ -25,13 +25,35 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#">Os2Woo Importer</a>
+            <a class="navbar-brand" href="/">Os2Woo Importer</a>
         </div>
         <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
-                <li @if(Request::is('products')) class="active" @endif><a href="/products">Products</a></li>
+                <li class="dropdown @if(Request::is('products')) active @endif" >
+                    <a href="#" class="dropdown-toggle" data-hover="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Products <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li @if(Request::is('products')) class="active" @endif><a href="/products">Import All Products</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#">Import Cross-Sells</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#">Imported Report</a></li>
+                        <li><a href="#">Errors Report</a></li>
+
+                    </ul>
+                </li>
                 <li @if(Request::is('customers')) class="active" @endif><a href="/customers">Customers</a></li>
-                <li @if(Request::is('orders')) class="active" @endif><a href="/orders">Orders</a></li>
+                <li class="dropdown @if(Request::is('orders')) active @endif" >
+                    <a href="#" class="dropdown-toggle" data-hover="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Orders <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li @if(Request::is('orders')) class="active" @endif><a href="/orders">Import All Orders</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#">Update Order Dates</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#">Imported Report</a></li>
+                        <li><a href="#">Errors Report</a></li>
+
+                    </ul>
+                </li>
                 <li @if(Request::is('coupons')) class="active" @endif><a href="/coupons">Coupons</a></li>
                 {{--<li @if(Request::is('reports')) class="active" @endif><a href="/reports">Reports</a></li>--}}
             </ul>
@@ -53,6 +75,7 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 <script src="http://cdnjs.cloudflare.com/ajax/libs/vue/0.12.4/vue.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+<script src="/assets/js/bootstrap-hover-dropdown.min.js"></script>
 @yield('footer')
 <script src="/assets/js/app.js"></script>
 </body>
