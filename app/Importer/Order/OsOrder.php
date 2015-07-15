@@ -187,5 +187,10 @@ class OsOrder extends Model implements ToWooCommerce {
 
 	private function getWooCustomerId() {
 		$customer = ImportedCustomer::where('os_id','=',$this->customers_id)->get()->first();
+		if(isset($customer['wc_id'])){
+			return $customer['wc_id'];
+		}
+
+		throw new \Exception("the customer has not been imported yet.");
 	}
 }
