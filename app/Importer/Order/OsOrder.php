@@ -60,8 +60,8 @@ class OsOrder extends Model implements ToWooCommerce {
             'payment_details'  => [
                 'method_id'      => $this->getPaymentMethodId(),
                 'method_title'   => $this->getPaymentMethodTitle(),
-                'paid'           => true, // or false
-                'transaction_id' => 'no idea'
+                'paid'           => $this->getPaymentMethodId() == 'completed' ? true : false, // or false
+//              'transaction_id' => 'no idea'
             ],
             'billing_address'  => [
                 'first_name' => $this->getFirstName($this->billing_name),
@@ -107,8 +107,8 @@ class OsOrder extends Model implements ToWooCommerce {
             4 => 'completed',//"Intransit (Tracking Number)"
             5 => 'cancelled',//"Order Cancelled"
             6 => 'failed',//"Customer Black List"
-            7 => 'processing',//"Preparing [PayPal Standard]"
-            8 => 'refund',// refund
+            7 => 'on-hold',//"Preparing [PayPal Standard]"
+            8 => 'refund',// Refund
         ];
 
         return isset($statusList[(int) $status]) ? $statusList[(int) $status] : 'on-hold';
