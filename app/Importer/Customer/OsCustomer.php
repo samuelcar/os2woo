@@ -38,35 +38,35 @@ class OsCustomer extends Model implements ToWooCommerce {
 	public function getBillingAddress() {
 		$addressBook = $this->addressBook()->with( 'country' )->get()->toArray();
 		if ( count( $addressBook ) == 1 ) {
-			$addr = current( $addressBook );
+			$address = current( $addressBook );
 
 			return [
-				'first_name' => $addr['entry_firstname'],
-				'last_name'  => $addr['entry_lastname'],
-				'company'    => $addr['entry_company'],
-				'address_1'  => $addr['entry_street_address'],
-				'address_2'  => $addr['entry_suburb'],
-				'city'       => $addr['entry_city'],
-				'state'      => $addr['entry_state'],
-				'postcode'   => $addr['entry_postcode'],
-				'country'    => $addr['country']['countries_iso_code_2'],
+				'first_name' => $address['entry_firstname'],
+				'last_name'  => $address['entry_lastname'],
+				'company'    => $address['entry_company'],
+				'address_1'  => $address['entry_street_address'],
+				'address_2'  => $address['entry_suburb'],
+				'city'       => $address['entry_city'],
+				'state'      => $address['entry_state'],
+				'postcode'   => $address['entry_postcode'],
+				'country'    => $address['country']['countries_iso_code_2'],
 				'email'      => $this->customers_email_address,
 				'phone'      => $this->customers_telephone
 
 			];
 		} elseif ( count( $addressBook ) > 1 ) {
-			foreach ( $addressBook as $addr ) {
-				if ( $this->customers_default_address_id == $addr['address_book_id'] ) {
+			foreach ( $addressBook as $address ) {
+				if ( $this->customers_default_address_id == $address['address_book_id'] ) {
 					return [
-						'first_name' => $addr['entry_firstname'],
-						'last_name'  => $addr['entry_lastname'],
-						'company'    => $addr['entry_company'],
-						'address_1'  => $addr['entry_street_address'],
-						'address_2'  => $addr['entry_suburb'],
-						'city'       => $addr['entry_city'],
-						'state'      => $addr['entry_state'],
-						'postcode'   => $addr['entry_postcode'],
-						'country'    => $addr['country']['countries_iso_code_2'],
+						'first_name' => $address['entry_firstname'],
+						'last_name'  => $address['entry_lastname'],
+						'company'    => $address['entry_company'],
+						'address_1'  => $address['entry_street_address'],
+						'address_2'  => $address['entry_suburb'],
+						'city'       => $address['entry_city'],
+						'state'      => $address['entry_state'],
+						'postcode'   => $address['entry_postcode'],
+						'country'    => $address['country']['countries_iso_code_2'],
 						'email'      => $this->customers_email_address,
 						'phone'      => $this->customers_telephone
 
@@ -82,18 +82,18 @@ class OsCustomer extends Model implements ToWooCommerce {
 
 		$addressBook = $this->addressBook()->with( 'country' )->get()->toArray();
 
-		foreach ( $addressBook as $addr ) {
-			if ( $this->customers_default_address_id != $addr['address_book_id'] ) {
+		foreach ( $addressBook as $address ) {
+			if ( $this->customers_default_address_id != $address['address_book_id'] ) {
 				return [
-					'first_name' => $addr['entry_firstname'],
-					'last_name'  => $addr['entry_lastname'],
-					'company'    => $addr['entry_company'],
-					'address_1'  => $addr['entry_street_address'],
-					'address_2'  => $addr['entry_suburb'],
-					'city'       => $addr['entry_city'],
-					'state'      => $addr['entry_state'],
-					'postcode'   => $addr['entry_postcode'],
-					'country'    => $addr['country']['countries_iso_code_2'],
+					'first_name' => $address['entry_firstname'],
+					'last_name'  => $address['entry_lastname'],
+					'company'    => $address['entry_company'],
+					'address_1'  => $address['entry_street_address'],
+					'address_2'  => $address['entry_suburb'],
+					'city'       => $address['entry_city'],
+					'state'      => $address['entry_state'],
+					'postcode'   => $address['entry_postcode'],
+					'country'    => $address['country']['countries_iso_code_2'],
 				];
 
 			}
