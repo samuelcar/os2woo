@@ -75,7 +75,7 @@ class OsProduct extends Model implements ToWooCommerce
             //            //is an array
             //            "cross_sell_ids" => $wc_product->get_cross_sells(),
             //            "parent_id" => $wc_product->get_parent(),
-            //            "categories" => $this->getProductCategories($wc_product),
+            "categories" => $this->getProductCategories(),
             //            "tags" => $this->getProductTags($wc_product),
             'images' => [
                 ['src' => $this->image_path . $this->products_image, 'position' => 0]
@@ -172,4 +172,9 @@ class OsProduct extends Model implements ToWooCommerce
 	public function getOsAttributes() {
 		return $this->attributes()->with( 'name', 'value' )->get()->toArray();
 	}
+
+    private function getProductCategories() {
+
+
+    }
 }

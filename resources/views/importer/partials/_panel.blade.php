@@ -62,7 +62,7 @@
                  v-class="progress-bar-striped: working,
                      active: working,
                      progress-bar-success: finished,
-                     progress-bar-info: working,
+                     progress-bar-info: working,address_format
                      progress-bar-warning: !working && !finished"
                  role="progressbar" aria-valuemin="0" aria-valuemax="100"
                  v-style="width: session_per+'%'">

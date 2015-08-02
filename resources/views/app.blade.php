@@ -62,7 +62,7 @@
     </div>
 </nav>
 
-<div class="container">
+<div class="container" v-cloak>
     @yield('content')
 </div>
 <!-- /.container -->

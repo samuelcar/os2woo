@@ -9,3 +9,5 @@ body {
 .panel-title, .panel-body p, .jumbotron,.import-controls {
     text-align: center;
 }
+
+[v-cloak] { display: none; }
