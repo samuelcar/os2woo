@@ -76,6 +76,18 @@ return [
             'strict'    => false,
         ],
 
+        'wordpress' => [
+            'driver'    => 'mysql',
+            'host'      => env('WP_HOST', 'localhost'),
+            'database'  => env('WP_DATABASE', 'msss'),
+            'username'  => env('WP_USERNAME', 'msss'),
+            'password'  => env('WP_PASSWORD', 'msss'),
+            'charset'   => 'utf8',
+            'collation' => 'utf8_unicode_ci',
+            'prefix'    => '',
+            'strict'    => false,
+        ],
+
         'pgsql' => [
             'driver'   => 'pgsql',
             'host'     => env('DB_HOST', 'localhost'),

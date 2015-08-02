@@ -47,7 +47,7 @@
                     <ul class="dropdown-menu">
                         <li @if(Request::is('orders')) class="active" @endif><a href="/orders">Import All Orders</a></li>
                         <li role="separator" class="divider"></li>
-                        <li><a href="#">Update Order Dates</a></li>
+                        <li><a href="/orders/update">Update Order Dates</a></li>
                         <li role="separator" class="divider"></li>
                         <li><a href="#">Imported Report</a></li>
                         <li><a href="#">Errors Report</a></li>

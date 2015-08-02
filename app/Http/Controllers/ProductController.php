@@ -32,9 +32,9 @@ class ProductController extends Controller
             'os_total' => OsProduct::count(),
             'imported_total' => ImportedProduct::count(),
             'resource' =>  array_values(
-                array_diff(OsProduct::lists('products_id')->toArray(),
-                    ImportedProduct::lists('os_id')->toArray(),
-                    ErrorProduct::lists('os_id')->toArray()
+                array_diff(OsProduct::lists('products_id')->orderBy('products_id', 'desc')->toArray(),
+                    ImportedProduct::lists('os_id')->orderBy('os_id', 'desc')->toArray(),
+                    ErrorProduct::lists('os_id')->orderBy('os_id', 'desc')->toArray()
                 )
             )
         ]);

@@ -21,10 +21,12 @@ get('/changemail', function(){
 post('products', 'ProductController@import');
 post('customers', 'CustomerController@import');
 post('orders', 'OrderController@import');
+post('orders/update', 'OrderController@update');
 
 get('products', 'ProductController@index');
 get('customers', 'CustomerController@index');
 get('orders', 'OrderController@index');
+get('orders/update', 'OrderController@dates');
 get('coupons', 'CouponController@index');
 
 Route::controllers([
