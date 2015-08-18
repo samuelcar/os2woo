@@ -9,6 +9,8 @@
 
     <!-- Bootstrap core CSS -->
     <link href="https://bootswatch.com/flatly/bootstrap.min.css" rel="stylesheet">
+    <link href="//cdn.datatables.net/1.10.7/css/jquery.dataTables.min.css" rel="stylesheet">
+    <link href="//cdn.datatables.net/plug-ins/1.10.7/integration/bootstrap/3/dataTables.bootstrap.css" rel="stylesheet">
     <link rel="stylesheet" href="/assets/css/app.css"/>
     @yield('header')
 </head>
@@ -34,14 +36,21 @@
                     <ul class="dropdown-menu">
                         <li @if(Request::is('products')) class="active" @endif><a href="/products">Import All Products</a></li>
                         <li role="separator" class="divider"></li>
-                        <li><a href="#">Import Cross-Sells</a></li>
-                        <li role="separator" class="divider"></li>
-                        <li><a href="#">Imported Report</a></li>
-                        <li><a href="#">Errors Report</a></li>
+                        <li><a href="/products/imported">Imported Report</a></li>
+                        <li><a href="/products/errors">Errors Report</a></li>
 
                     </ul>
                 </li>
-                <li @if(Request::is('customers')) class="active" @endif><a href="/customers">Customers</a></li>
+                <li class="dropdown @if(Request::is('customers')) active @endif" >
+                    <a href="#" class="dropdown-toggle" data-hover="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Customers <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li @if(Request::is('customers')) class="active" @endif><a href="/customers">Import All Customers</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="/customers/imported">Imported Report</a></li>
+                        <li><a href="/customers/errors">Errors Report</a></li>
+
+                    </ul>
+                </li>
                 <li class="dropdown @if(Request::is('orders')) active @endif" >
                     <a href="#" class="dropdown-toggle" data-hover="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Orders <span class="caret"></span></a>
                     <ul class="dropdown-menu">
@@ -49,8 +58,8 @@
                         <li role="separator" class="divider"></li>
                         <li><a href="/orders/update">Update Order Dates</a></li>
                         <li role="separator" class="divider"></li>
-                        <li><a href="#">Imported Report</a></li>
-                        <li><a href="#">Errors Report</a></li>
+                        <li><a href="/orders/imported">Imported Report</a></li>
+                        <li><a href="/orders/errors">Errors Report</a></li>
 
                     </ul>
                 </li>
@@ -62,7 +71,7 @@
     </div>
 </nav>
 
-<div class="container" v-cloak>
+<div class="container">
     @yield('content')
 </div>
 <!-- /.container -->
@@ -75,7 +84,9 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 <script src="http://cdnjs.cloudflare.com/ajax/libs/vue/0.12.4/vue.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+<script src="//cdn.datatables.net/1.10.7/js/jquery.dataTables.min.js"></script>
 <script src="/assets/js/bootstrap-hover-dropdown.min.js"></script>
+<script src="//cdn.datatables.net/plug-ins/1.10.7/integration/bootstrap/3/dataTables.bootstrap.js"></script>
 @yield('footer')
 <script src="/assets/js/app.js"></script>
 </body>

@@ -31,14 +31,14 @@ class CustomerController extends Controller
             'os_total' => OsCustomer::count(),
             'imported_total' => ImportedCustomer::count(),
             'resource' => array_values(
-                array_diff(OsCustomer::lists('customers_id')->toArray(),
-                    ImportedCustomer::lists('os_id')->toArray(),
-                    ErrorCustomer::lists('os_id')->toArray()
+                array_diff(OsCustomer::orderBy('customers_id', 'desc')->lists('customers_id')->toArray(),
+                    ImportedCustomer::orderBy('os_id', 'desc')->lists('os_id')->toArray(),
+                    ErrorCustomer::orderBy('os_id', 'desc')->lists('os_id')->toArray()
                 )
             )
         ]);
 
-        return view('importer.customers');
+        return view('importer.index',['resource' => 'Customers']);
     }
 
     /**
@@ -77,5 +77,13 @@ class CustomerController extends Controller
         }
 
         return $result;
+    }
+
+    public function imported(){
+        return view('importer.customers.success',['data' => ImportedCustomer::all()]);
+    }
+
+    public function errors(){
+        return view('importer.customers.errors',['data' => ErrorCustomer::all()]);
     }
 }

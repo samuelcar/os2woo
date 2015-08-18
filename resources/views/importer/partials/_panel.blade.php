@@ -1,3 +1,4 @@
+<div v-cloak>
 <div class="row">
     <div class="col-md-3 col-sm-6">
         <div class="panel panel-primary">
@@ -62,7 +63,7 @@
                  v-class="progress-bar-striped: working,
                      active: working,
                      progress-bar-success: finished,
-                     progress-bar-info: working,address_format
+                     progress-bar-info: working,
                      progress-bar-warning: !working && !finished"
                  role="progressbar" aria-valuemin="0" aria-valuemax="100"
                  v-style="width: session_per+'%'">
@@ -93,4 +94,4 @@
         </div>
 
     </div>
-</div>
+</div></div>

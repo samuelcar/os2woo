@@ -6,6 +6,7 @@ use App\Contracts\Store;
 use App\Importer\Product\ErrorProduct;
 use App\Importer\Product\ImportedProduct;
 use App\Importer\Product\OsProduct;
+use App\Importer\Product\Category;
 use Exception;
 
 use App\Http\Requests;
@@ -13,6 +14,7 @@ use App\Http\Controllers\Controller;
 use Faker\Factory;
 use Illuminate\Support\Facades\Input;
 use JavaScript;
+use Log;
 
 class ProductController extends Controller
 {
@@ -20,26 +22,38 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param Store $store
+     *
      * @return Response
      */
-    public function index()
+    public function index(Store $store)
     {
+        $categories = $store->getCategories();
 
-       /*ImportedProduct::truncate();
-	   ErrorProduct::truncate();*/
-        JavaScript::put([
+        foreach ($categories->product_categories as $key => $category) {
+            Category::create([
+                'woo_id' => $category->id,
+                'name'   => $category->name,
+                'slug'   => $category->slug
+            ]);
+        }
+
+        dd(Category::all()->toArray());
+ //   ImportedProduct::truncate();
+//        ErrorProduct::truncate();
+       JavaScript::put([
             'url' => '/products',
             'os_total' => OsProduct::count(),
             'imported_total' => ImportedProduct::count(),
             'resource' =>  array_values(
-                array_diff(OsProduct::lists('products_id')->orderBy('products_id', 'desc')->toArray(),
-                    ImportedProduct::lists('os_id')->orderBy('os_id', 'desc')->toArray(),
-                    ErrorProduct::lists('os_id')->orderBy('os_id', 'desc')->toArray()
+                array_diff(OsProduct::orderBy('products_id', 'desc')->lists('products_id')->toArray(),
+                    ImportedProduct::orderBy('os_id', 'desc')->lists('os_id')->toArray(),
+                    ErrorProduct::orderBy('os_id', 'desc')->lists('os_id')->toArray()
                 )
             )
         ]);
 
-        return view('importer.products');
+        return view('importer.index',['resource' => 'Products']);
     }
 
     /**
@@ -55,7 +69,8 @@ class ProductController extends Controller
         try {
 
 	        $result = $store->createProduct($product->toWooCommerce());
-	        $result = $store->updateProduct($result->product->id, $product->toWooCommerce());
+            Log::info($result);
+	       // $result = $store->updateProduct($result->product->id, $product->toWooCommerce());
             if (isset($result->product)) {
                 ImportedProduct::create([
                     'os_id' => $product->products_id,
@@ -79,6 +94,14 @@ class ProductController extends Controller
         }
 
         return $result;
+    }
+
+    public function imported(){
+        return view('importer.products.success',['data' => ImportedProduct::all()]);
+    }
+
+    public function errors(){
+        return view('importer.products.errors',['data' => ErrorProduct::all()]);
     }
 
 }

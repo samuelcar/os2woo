@@ -37,4 +37,6 @@ interface Store
     public function getProducts();
 
 	public function updateProduct($id, array $product);
+
+    public function getCategories();
 }

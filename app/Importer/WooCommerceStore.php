@@ -34,9 +34,7 @@ class WooCommerceStore implements Store
 
     public function createProduct(array $product)
     {
-        $client = new WC_API_Client_Resource_Products($this->client);
-
-        return $client->create([
+        return $this->client->products->create([
                 'product' => $product
             ]
         );
@@ -44,9 +42,7 @@ class WooCommerceStore implements Store
 
     public function updateProduct($id, array $product)
     {
-	    $client = new WC_API_Client_Resource_Products($this->client);
-
-	    return $client->update($id, [
+	    return $this->client->products->update($id, [
                 'product' => $product
             ]
         );
@@ -54,9 +50,7 @@ class WooCommerceStore implements Store
 
     public function createCustomer(array $customer)
     {
-        $client = new WC_API_Client_Resource_Customers($this->client);
-
-        return $client->create([
+        return $this->client->customers->create([
                 'customer' => $customer
             ]
         );
@@ -64,9 +58,7 @@ class WooCommerceStore implements Store
 
     public function createOrder(array $order)
     {
-	    $client = new \WC_API_Client_Resource_Orders($this->client);
-
-	    return $client->create([
+	    return $this->client->orders->create([
 			    'order' => $order
 		    ]
 	    );
@@ -154,4 +146,7 @@ class WooCommerceStore implements Store
         return $result;
     }
 
+    public function getCategories() {
+        return $this->client->products->get_categories();
+    }
 }
