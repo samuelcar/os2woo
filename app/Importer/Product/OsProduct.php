@@ -176,13 +176,31 @@ class OsProduct extends Model implements ToWooCommerce {
     private function getProductCategories() {
         $categories = [];
         $firstCat = $this->categories()->first();
+        $name = $firstCat->description->categories_name;
+        $id = $firstCat->description->categories_id;
 
-        $end = true;
+        $continue = true;
 
-        while ($end) {
+        while ($continue) {
+            switch ($id){
+                case 557: $name = 'HRT Diecast Models';
+                    break;
+                case 555: $name = 'RED BULL RACING DIECAST MODELS';
+                    break;
+                case 555: $name = 'JACK DANIELS RACING DIECAST MODELS';
+                    break;
+            }
+
+
+
+
+            $exists = Category::where('os_id', $id)->orWhere('name', $name)->first();
+            if (! $exists ) {
+
+            }
             $categories[] = $firstCat->description->categories_name;
             $firstCat = OsCategory::find($firstCat->parent_id);
-            $end = $firstCat ? $end : false;
+            $continue = $firstCat ? $continue : false;
         }
 
         return array_reverse($categories);

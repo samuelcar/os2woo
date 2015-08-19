@@ -28,17 +28,7 @@ class ProductController extends Controller
      */
     public function index(Store $store)
     {
-        $categories = $store->getCategories();
-
-        foreach ($categories->product_categories as $key => $category) {
-            Category::create([
-                'woo_id' => $category->id,
-                'name'   => $category->name,
-                'slug'   => $category->slug
-            ]);
-        }
-
-        dd(Category::all()->toArray());
+      dd(Category::all()->toArray());
  //   ImportedProduct::truncate();
 //        ErrorProduct::truncate();
        JavaScript::put([
