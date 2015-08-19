@@ -28,7 +28,8 @@ class ProductController extends Controller
      */
     public function index(Store $store)
     {
-   
+
+      dd(Category::all()->toArray());
  //   ImportedProduct::truncate();
 //        ErrorProduct::truncate();
        JavaScript::put([
