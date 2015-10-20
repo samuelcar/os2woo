@@ -22,8 +22,8 @@ class OrderController extends Controller {
 
     public function index() {
 
-//        ImportedOrder::truncate();
-//        ErrorOrder::truncate();
+       // ImportedOrder::truncate();
+       // ErrorOrder::truncate();
 
         JavaScript::put([
             'url'            => '/orders',
@@ -84,8 +84,8 @@ class OrderController extends Controller {
      * @return \Illuminate\View\View
      */
     public function dates() {
-    //    UpdatedOrder::truncate();
-
+      // UpdatedOrder::truncate();
+      // ErrorOrder::truncate();  
 
         JavaScript::put([
             'url'            => '/orders/update',

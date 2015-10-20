@@ -45,6 +45,8 @@
                     <a href="#" class="dropdown-toggle" data-hover="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Customers <span class="caret"></span></a>
                     <ul class="dropdown-menu">
                         <li @if(Request::is('customers')) class="active" @endif><a href="/customers">Import All Customers</a></li>
+                         <li role="separator" class="divider"></li>
+                        <li><a href="/customers/update">Update Customer Points</a></li>
                         <li role="separator" class="divider"></li>
                         <li><a href="/customers/imported">Imported Report</a></li>
                         <li><a href="/customers/errors">Errors Report</a></li>

@@ -22,6 +22,7 @@ post('products', 'ProductController@import');
 post('customers', 'CustomerController@import');
 post('orders', 'OrderController@import');
 post('orders/update', 'OrderController@update');
+post('customers/update', 'CustomerController@update');
 
 get('products', 'ProductController@index');
 get('products/imported', 'ProductController@imported');
@@ -31,6 +32,7 @@ get('customers/imported', 'CustomerController@imported');
 get('customers/errors', 'CustomerController@errors');
 get('orders', 'OrderController@index');
 get('orders/update', 'OrderController@dates');
+get('customers/update', 'CustomerController@points');
 get('orders/imported', 'OrderController@imported');
 get('orders/errors', 'OrderController@errors');
 get('coupons', 'CouponController@index');
